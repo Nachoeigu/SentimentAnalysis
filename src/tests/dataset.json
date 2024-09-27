@@ -1,4 +1,4 @@
-reviews = [
+[
     {"review": "Terrible experience. The air conditioning broke, and they didn’t fix it for two days!", "evaluation": "negative"},
     {"review": "Sparki had great amenities, and the spa was exactly what I needed to relax.", "evaluation": "positive"},
     {"review": "The hotel was okay, but nothing special. I feel like I could have found better for the price.", "evaluation": "neutral"},
@@ -43,35 +43,3 @@ reviews = [
     {"review": "The staff was inattentive, and I felt like they didn’t care about the guests at all.", "evaluation": "negative"},
     {"review": "Sparki provided a fantastic vacation experience! Can’t wait to come back.", "evaluation": "positive"}
 ]
-
-correct_predictions = 0
-incorrect_predictions = 0
-
-for question in reviews:
-
-    import json
-    result = model.invoke(messages + [HumanMessage(content = question['review'], id = uuid.uuid4())])
-    import re
-
-    cleaned_response = result.content.replace('\n', '').replace(' ','')
-
-    try:
-        data = json.loads(cleaned_response)
-        automatically = 1
-    except:
-        data = json.loads('{'+re.search(pattern = '\"evaluation\"\:\"(positive|negative|neutral)\"', string = cleaned_response).group()+'}')
-        automatically = 0
-    
-    print(automatically)
-    if data['evaluation'] == question['evaluation']:
-        print("Correct prediction")
-        correct_predictions += 1
-    else:
-        print("Incorrect prediction")
-        incorrect_predictions += 1
-        print(f"Prediction was: {data['evaluation']}")
-        print(f"Real was: {question['evaluation']}")
-        print(f"Review was: {question['review']}")
-
-
-print("Accuracy:", str(round(correct_predictions/len(reviews),4)))
