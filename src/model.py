@@ -9,7 +9,6 @@ sys.path.append(WORKDIR)
 
 import json
 import re
-from typing import Literal
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_groq import ChatGroq
 from constants import SYSTEM_PROMPT, FEW_SHOT_EXAMPLES
@@ -18,12 +17,33 @@ import uuid
 from src.utils import convert_to_json
 
 class SentimentClassifier:
+    """
+    SentimentClassifier class for classifying the sentiment of hotel reviews.
 
+    Attributes:
+        model (BaseChatModel): The language model used for sentiment classification.
+        messages (list): The list of messages that form the prompt for the language model.
+    """
     def __init__(self, model: BaseChatModel):
+        """
+        Initializes the SentimentClassifier with a language model.
+
+        Args:
+            model (BaseChatModel): The language model to use for sentiment classification.
+
+        """
         self.model = model
         self.messages = self.__developing_prompt()
 
     def __developing_prompt(self):
+        """
+        Develops the prompt for the language model, including system instructions and few-shot examples.
+
+        Returns:
+            list: The list of messages that form the prompt.
+
+        """
+
         messages =[
             SystemMessage(content = SYSTEM_PROMPT)
         ]
@@ -37,6 +57,17 @@ class SentimentClassifier:
         return messages
         
     def __call__(self, review: str):
+        """
+        Classifies the sentiment of a given review.
+
+        Args:
+            review (str): The hotel review to classify.
+
+        Returns:
+            dict: A dictionary containing the sentiment evaluation.
+
+        """
+
         output = self.model.invoke(self.messages + [HumanMessage(content = review, id = uuid.uuid4())])
         output = re.sub(r'[\n\s]+', '', output.content)
         output = convert_to_json(output)
